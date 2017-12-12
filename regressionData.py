@@ -28,8 +28,8 @@ class artificial:
 					
 		if self.dataType == '1D':
 			# 入力データ行列Xを作成
-			self.xTrain = np.random.rand(trainNum) * xRangeWidth + self.xRange[0]
-			self.xTest =  np.random.rand(testNum) * xRangeWidth + self.xRange[0]
+			self.xTrain = (np.random.rand(trainNum) * xRangeWidth + self.xRange[0])[np.newaxis]
+			self.xTest =  (np.random.rand(testNum) * xRangeWidth + self.xRange[0])[np.newaxis]
 			
 		elif self.dataType == '2D':
 			# 入力データ行列Xを作成
@@ -37,7 +37,7 @@ class artificial:
 			self.xTest =  np.random.rand(2,testNum) * xRangeWidth + self.xRange[0]
 			
 		# ラベルベクトルyを作成
-		self.yTrain =  self.sampleLinearTarget(self.xTrain, noiseLvl=0.1)
+		self.yTrain = self.sampleLinearTarget(self.xTrain, noiseLvl=0.1)
 		self.yTest = self.sampleLinearTarget(self.xTest, noiseLvl=0.1)
 		
 	#------------------------------------
@@ -47,11 +47,11 @@ class artificial:
 	# x: 入力データ（入力次元 x データ数）
 	# noiseLvl: ノイズレベル（スカラー）
 	def sampleLinearTarget(self,x, noiseLvl=0):
-		
+				
 		# sin関数
 		if self.dataType == '1D':
-			y = np.sin(0.1*x)+2
-			xNum = len(x)
+			y = np.sin(0.1*x)[0]+2
+			xNum = x.shape[1]
 			
 		elif self.dataType == '2D':
 			y = np.sin(0.1*x[0,:] + 0.1*x[1,:])+2
@@ -62,22 +62,26 @@ class artificial:
 			y += np.random.normal(0,noiseLvl,xNum)
 		
 		return y
-
+	
 	#------------------------------------
 	# データのプロット
-	def plot(self):
+	def plot(self,predict=[]):
+		if self.dataType == "1D":
+			self.plot2D(predict)
+		elif self.dataType == "2D":
+			self.plot3D(predict)
+	#------------------------------------
+
+	#------------------------------------
+	# 3次元データのプロット
+	# predict: 予測結果（データ数）
+	def plot3D(self,predict=[]):
 
 		# 3次元データの準備
 		xTrain = self.xTrain
 		xTest = self.xTest
-		
-		if self.dataType == '1D':
-			xTrainNum = len(xTrain)
-			xTestNum = len(xTest)
-			xTrain = np.append(xTrain[np.newaxis], np.zeros([1,xTrainNum]),axis=0)
-			xTest =  np.append(xTest[np.newaxis], np.zeros([1,xTestNum]),axis=0)
-			
 
+		# 3次元プロット用のAxes3Dを利用
 		fig = plt.figure()
 		ax = Axes3D(fig)
 
@@ -86,24 +90,83 @@ class artificial:
 
 		# 評価データを描画
 		ax.plot(xTest[0,:], xTest[1,:], self.yTest, 's', color="#FFFF00", markeredgecolor='k', markersize=8)
+		
+		if len(predict):
+			# 予測結果を描画
+			ax.plot(xTest[0,:], xTest[1,:], predict, 'd', color="#FF0000", markeredgecolor='k', markersize=8)
 
 		# plotラベルの設定
 		ax.set_xlabel("x1", fontsize=14)
 		ax.set_ylabel("x2", fontsize=14)
 		ax.set_zlabel("y", fontsize=14)
 		ax.tick_params(labelsize=14)
-		ax.legend(("Training Data","Test Data"))
+		
+		if len(predict):
+			ax.legend(("Training Data","Test Data","Predict"))
+		else:
+			ax.legend(("Training Data","Test Data"))
 
 		# 表示範囲の設定
-		ax.set_xlim(self.xRange[0],self.xRange[1])
-		ax.set_ylim(self.xRange[0],self.xRange[1])
-		ax.set_zlim(np.min(self.yTest) - np.min(self.yTest)*0.1, np.max(self.yTest) + np.max(self.yTest)*0.1)
+		ax.set_xlim(self.addMargin(self.xRange[0],"min"),self.addMargin(self.xRange[1],"max"))
+		ax.set_ylim(self.addMargin(self.xRange[0],"min"),self.addMargin(self.xRange[1],"max"))
+		ax.set_zlim(self.addMargin(np.min(self.yTest),"min"), self.addMargin(np.max(self.yTest),"max"))
 		
 		# 保存
 		fullpath = os.path.join(self.visualPath,"{}_regressionData.png".format(self.prefix))
 		plt.savefig(fullpath)
-		
+		          
 		# 表示
 		plt.show()
+	#------------------------------------
+
+	#------------------------------------
+	# 2次元データのプロット
+	# predict: 予測結果（データ数）
+	def plot2D(self,predict=[]):
+
+		# 2次元データの準備
+		xTrain = self.xTrain[0]
+		xTest = self.xTest[0]
+
+
+		# 学習データを描画
+		plt.plot(xTrain, self.yTrain, 'o', color="#FFA500", markeredgecolor='k', markersize=8)
+
+		# 評価データを描画
+		plt.plot(xTest, self.yTest, 's', color="#FFFF00", markeredgecolor='k', markersize=8)
+		
+		if len(predict):
+			# 予測結果を描画
+			plt.plot(xTest, predict, 'd', color="#FF0000", markeredgecolor='k', markersize=8)
+
+		# plotラベルの設定
+		plt.xlabel("x", fontsize=14)
+		plt.ylabel("y", fontsize=14)
+		plt.tick_params(labelsize=14)
+		
+		if len(predict):
+			plt.legend(("Training Data","Test Data","Predict"))
+		else:
+			plt.legend(("Training Data","Test Data"))
+
+		# 表示範囲の設定
+		plt.xlim(self.addMargin(self.xRange[0],"min"),self.addMargin(self.xRange[1],"max"))
+		plt.ylim(self.addMargin(np.min(self.yTest),"min"), self.addMargin(np.max(self.yTest),"max"))
+		
+		# 保存
+		fullpath = os.path.join(self.visualPath,"{}_regressionData.png".format(self.prefix))
+		plt.savefig(fullpath)
+		          
+		# 表示
+		plt.show()
+	#------------------------------------
+	
+	#------------------------------------
+	# グラフの余白の計算
+	# x: 余白を計算したい数値（スカラー）
+	def addMargin(self,x,mode="min",margin=0.5):
+		limit = [x - margin if mode=="min" else x + margin][0]
+			
+		return limit
 	#------------------------------------
 #------------------------------------
