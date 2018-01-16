@@ -63,10 +63,12 @@ class linearRegression():
 if __name__ == "__main__":
 	
 	# 1) 学習入力次元が2の場合のデーター生成
-	myData = rg.artificial(200,100, dataType="1D")
+	#myData = rg.artificial(200,100, dataType="1D")
+	myData = rg.artificial(200,100, dataType="1D",isNonlinear=True)
 	
 	# 2) 線形回帰モデル
-	regression = linearRegression(myData.xTrain,myData.yTrain)
+	#regression = linearRegression(myData.xTrain,myData.yTrain)
+	regression = linearRegression(myData.xTrain,myData.yTrain,kernelType="gaussian",kernelParam=1)
 	
 	# 3) 学習（For文版）
 	sTime = time.time()
