@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
 	# 6) 学習・評価データおよび予測結果をプロット
 	predict = regression.predict(myData.xTest)
-	myData.plot(predict)
+	myData.plot(predict,isTrainPlot=False)
 	
 #メインの終わり
 #-------------------

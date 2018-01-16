@@ -92,9 +92,9 @@ class artificial:
 	
 	#------------------------------------
 	# データのプロット
-	def plot(self,predict=[]):
+	def plot(self,predict=[],isTrainPlot=True):
 		if self.dataType == "1D":
-			self.plot2D(predict)
+			self.plot2D(predict,isTrainPlot)
 		elif self.dataType == "2D":
 			self.plot3D(predict)
 	#------------------------------------
@@ -102,7 +102,7 @@ class artificial:
 	#------------------------------------
 	# 3次元データのプロット
 	# predict: 予測結果（データ数）
-	def plot3D(self,predict=[]):
+	def plot3D(self,predict=[],isTrainPlot=True):
 
 		# 3次元データの準備
 		xTrain = self.xTrain
@@ -112,8 +112,9 @@ class artificial:
 		fig = plt.figure()
 		ax = Axes3D(fig)
 
-		# 学習データを描画
-		ax.plot(xTrain[0,:], xTrain[1,:], self.yTrain, 'o', color="#FFA500", markeredgecolor='k', markersize=8)
+		if isTrainPlot:
+			# 学習データを描画
+			ax.plot(xTrain[0,:], xTrain[1,:], self.yTrain, 'o', color="#FFA500", markeredgecolor='k', markersize=8)
 
 		# 評価データを描画
 		ax.plot(xTest[0,:], xTest[1,:], self.yTest, 's', color="#FFFF00", markeredgecolor='k', markersize=8)
@@ -129,9 +130,15 @@ class artificial:
 		ax.tick_params(labelsize=14)
 		
 		if len(predict):
-			ax.legend(("Training Data","Test Data","Predict"))
+			if isTrainPlot:
+				plt.legend(("Training Data","Test Data","Predict"))
+			else:
+				plt.legend(("Test Data","Predict"))
 		else:
-			ax.legend(("Training Data","Test Data"))
+			if isTrainPlot:
+				plt.legend(("Training Data","Test Data"))
+			else:
+				plt.legend(("Test Data"))
 
 		# 表示範囲の設定
 		ax.set_xlim(self.addMargin(self.xRange[0],"min"),self.addMargin(self.xRange[1],"max"))
@@ -149,15 +156,15 @@ class artificial:
 	#------------------------------------
 	# 2次元データのプロット
 	# predict: 予測結果（データ数）
-	def plot2D(self,predict=[]):
+	def plot2D(self,predict=[],isTrainPlot=True):
 
 		# 2次元データの準備
 		xTrain = self.xTrain[0]
 		xTest = self.xTest[0]
 
-
-		# 学習データを描画
-		plt.plot(xTrain, self.yTrain, 'o', color="#FFA500", markeredgecolor='k', markersize=8)
+		if isTrainPlot:
+			# 学習データを描画
+			plt.plot(xTrain, self.yTrain, 'o', color="#FFA500", markeredgecolor='k', markersize=8)
 
 		# 評価データを描画
 		plt.plot(xTest, self.yTest, 's', color="#FFFF00", markeredgecolor='k', markersize=8)
@@ -172,9 +179,15 @@ class artificial:
 		plt.tick_params(labelsize=14)
 		
 		if len(predict):
-			plt.legend(("Training Data","Test Data","Predict"))
+			if isTrainPlot:
+				plt.legend(("Training Data","Test Data","Predict"))
+			else:
+				plt.legend(("Test Data","Predict"))
 		else:
-			plt.legend(("Training Data","Test Data"))
+			if isTrainPlot:
+				plt.legend(("Training Data","Test Data"))
+			else:
+				plt.legend(["Test Data"])
 
 		# 表示範囲の設定
 		plt.xlim(self.addMargin(self.xRange[0],"min"),self.addMargin(self.xRange[1],"max"))
