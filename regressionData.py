@@ -17,7 +17,7 @@ class artificial:
 	# trainNum: 学習データ数（スカラー）
 	# testNum: 評価データ数（スカラー）
 	# dataType: 入力次元（文字列:'1D', '2D')
-	def __init__(self,trainNum, testNum, dataType='1D'):
+	def __init__(self,trainNum, testNum, dataType='1D', isNonlinear=False):
 		
 		# dataTypeによって1Dと2Dを切り替え
 		self.dataType = dataType
@@ -37,8 +37,12 @@ class artificial:
 			self.xTest =  np.random.rand(2,testNum) * xRangeWidth + self.xRange[0]
 			
 		# ラベルベクトルyを作成
-		self.yTrain = self.sampleLinearTarget(self.xTrain, noiseLvl=0.1)
-		self.yTest = self.sampleLinearTarget(self.xTest, noiseLvl=0.1)
+		if isNonlinear:
+			self.yTrain = self.sampleNonLinearTarget(self.xTrain, noiseLvl=0.1)
+			self.yTest = self.sampleNonLinearTarget(self.xTest, noiseLvl=0.1)		
+		else:
+			self.yTrain = self.sampleLinearTarget(self.xTrain, noiseLvl=0.1)
+			self.yTest = self.sampleLinearTarget(self.xTest, noiseLvl=0.1)
 		
 	#------------------------------------
 
@@ -62,6 +66,29 @@ class artificial:
 			y += np.random.normal(0,noiseLvl,xNum)
 		
 		return y
+	#------------------------------------
+
+	#------------------------------------
+	# 目標の線形関数
+	# x: 入力データ（入力次元 x データ数）
+	# noiseLvl: ノイズレベル（スカラー）
+	def sampleNonLinearTarget(self,x, noiseLvl=0):
+				
+		# sin関数
+		if self.dataType == '1D':
+			y = np.sin(x)[0]+2
+			xNum = x.shape[1]
+			
+		elif self.dataType == '2D':
+			y = np.sin(x[0,:] + 0.1*x[1,:])+2
+			xNum = x.shape[1]
+		
+		# ノイズの付加
+		if noiseLvl:
+			y += np.random.normal(0,noiseLvl,xNum)
+		
+		return y
+	#------------------------------------
 	
 	#------------------------------------
 	# データのプロット

@@ -12,12 +12,18 @@ class linearRegression():
 	# 1) 学習データおよびモデルパラメータの初期化
 	# x: 学習入力データ（入力ベクトルの次元数×データ数のnumpy.array）
 	# y: 学習出力データ（データ数のnumpy.array）
-	def __init__(self, x, y):
+	# kernelType: カーネルの種類（文字列：gaussian）
+	# kernelParam: カーネルのハイパーパラメータ（スカラー）
+	def __init__(self, x, y, kernelType="linear", kernelParam=1.0):
 		# 学習データの設定
 		self.x = x
 		self.y = y
 		self.xDim = x.shape[0]
 		self.dNum = x.shape[1]
+		
+		# カーネルの設定
+		self.kernelType = kernelType
+		self.kernelParam = kernelParam
 	#------------------------------------
 
 	#------------------------------------
