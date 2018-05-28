@@ -123,7 +123,7 @@ class mountainCar:
 
 	
 if __name__ == '__main__':
-	isDemo = True
+	isDemo = False
 
 	# mountainCarのインスタンス
 	agent = mountainCar()
