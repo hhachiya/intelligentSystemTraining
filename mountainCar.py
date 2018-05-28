@@ -132,7 +132,7 @@ if __name__ == '__main__':
 	
 
 	# Qテーブルを読み込んでデモ
-	if isDemo == False:
+	if isDemo == True:
 		for episode in range(0,10000,500):
 			# Qテーブルの読み込み
 			agent.loadQ(episode)
