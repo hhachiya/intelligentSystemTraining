@@ -475,5 +475,102 @@ class MNIST:
 			
 		fig.show()
 		plt.show()
+	#------------------------------------
+#------------------------------------
+
+#------------------------------------
+# MNISTデータのクラス
+class fashion:
+	dataPath = 'fashionmnist'  # データのフォルダ名
+	imgSize = [28,28]
+	
+	#------------------------------------
+	# CSVファイルの読み込み
+	# fname: ファイルパス（文字列）
+	def __init__(self):
 		
+		#---------------
+		# 入力データX（入力次元Xデータ数）
+		# 学習用
+		#fp = gzip.open(os.path.join(self.dataPath,'train-images-idx3-ubyte'),'rb')
+		fp = open(os.path.join(self.dataPath,'train-images-idx3-ubyte'),'rb')
+		data = np.frombuffer(fp.read(),np.uint8,offset=16)
+		self.xTrain = np.reshape(data,[-1,self.imgSize[0]*self.imgSize[1]]).T
+		self.xTrain = self.xTrain/255
+
+		# 評価用
+		#fp = gzip.open(os.path.join(self.dataPath,'t10k-images-idx3-ubyte'),'rb')
+		fp = open(os.path.join(self.dataPath,'t10k-images-idx3-ubyte'),'rb')
+		data = np.frombuffer(fp.read(),np.uint8,offset=16)
+		self.xTest = np.reshape(data,[-1,self.imgSize[0]*self.imgSize[1]]).T
+		self.xTest = self.xTest/255
+
+		'''
+		# 平均画像
+		self.xTrainMean = np.mean(self.xTrain,axis=1)
+		self.xTrain = self.xTrain - self.xTrainMean[np.newaxis,1].T
+		self.xTest = self.xTest - self.xTrainMean[np.newaxis,1].T
+		'''
+		#---------------
+		
+		#---------------
+		# カテゴリデータ行列tを作成（カテゴリ数 X データ数）
+		# 学習用
+		#fp = gzip.open(os.path.join(self.dataPath,'train-labels-idx1-ubyte'),'rb')
+		fp = open(os.path.join(self.dataPath,'train-labels-idx1-ubyte'),'rb')
+		self.yTrain = np.frombuffer(fp.read(),np.uint8,offset=8)
+		self.tTrain = np.zeros([10,len(self.yTrain)])	# one-hot
+		[self.tTrain.itemset(self.yTrain[ind],ind,1) for ind in np.arange(len(self.yTrain))]
+		
+		# 評価用
+		#fp = gzip.open(os.path.join(self.dataPath,'t10k-labels-idx1-ubyte'),'rb')
+		fp = open(os.path.join(self.dataPath,'t10k-labels-idx1-ubyte'),'rb')
+		self.yTest = np.frombuffer(fp.read(),np.uint8,offset=8)
+		self.tTest = np.zeros([10,len(self.yTest)])	# one-hot
+		[self.tTest.itemset(self.yTest[ind],ind,1) for ind in np.arange(len(self.yTest))]
+		#---------------		
+	#------------------------------------
+	
+	#------------------------------------
+	# 指定したインデックスの学習または評価画像のプロット
+	# inds: インデックスのリスト
+	# isTrain: 学習データか否か（真偽値）
+	# predict: 予測カテゴリのリスト
+	def plotImg(self, inds=[], isTrain=True, predict=[]):
+
+		if isTrain:
+			x = self.xTrain
+			y = self.yTrain
+			prefix = "train data"
+		else:
+			x = self.xTest
+			y = self.yTest
+			prefix = "test data"
+			
+		if not len(inds):
+			inds = np.arange(len(x))
+			
+		for ind in inds:
+			plt.imshow(np.reshape(x[:,ind],[self.imgSize[0],self.imgSize[0]]), "gray", vmin=0, vmax=1)
+			
+			if len(predict):
+				plt.title("{} No.{}, GT:{}, predict:{}".format(prefix,ind,y[ind],predict[ind]))
+			else:
+				plt.title("{} No. {}, GT:{}".format(prefix,ind,y[ind]))
+				
+			plt.show()
+	#------------------------------------
+
+	#------------------------------------
+	# 全ての数字画像のプロット
+	def plotAllImg(self):
+		fig, figInds = plt.subplots(ncols=10, sharex=True)
+		
+		for figInd in np.arange(len(figInds)):
+			imgInd = np.where(self.yTest == figInd)[0][0]
+			figInds[figInd].imshow(np.reshape(self.xTest[:,imgInd],[self.imgSize[0],self.imgSize[0]]), "gray", vmin=0, vmax=1)
+			
+		fig.show()
+		plt.show()
+	#------------------------------------
 #------------------------------------
