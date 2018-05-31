@@ -31,9 +31,6 @@ class mountainCar:
 		# エピソードの初期化
 		self.episode = 0
 		
-		# ステップの初期化
-		self.step = 0
-		
 		# 収益の履歴の初期化
 		self.returns = []
 		
@@ -84,7 +81,7 @@ class mountainCar:
 		return state
 		
 	# 行動の選択
-	def selectAction(self, state, epsilon=0.002):
+	def selectAction(self, state, epsilon=0.02):
 			
 		if np.random.uniform(0, 1) > epsilon:
 			action = np.argmax(self.Q[state[0]][state[1]])
@@ -107,9 +104,6 @@ class mountainCar:
 			# doneがTrueになったら１エピソード終了
 			self.returns.append(self.sum_rewards)
 		
-		# ステップのインクリメント
-		self.step += 1
-		
 		return next_state, reward, done
 		
 	# Qの更新
@@ -125,7 +119,7 @@ class mountainCar:
 
 	
 if __name__ == '__main__':
-	isDemo = False
+	isDemo = True
 
 	# mountainCarのインスタンス
 	agent = mountainCar()
@@ -133,7 +127,7 @@ if __name__ == '__main__':
 
 	# Qテーブルを読み込んでデモ
 	if isDemo == True:
-		for episode in range(0,10000,500):
+		for episode in range(0,10000,100):
 			# Qテーブルの読み込み
 			agent.loadQ(episode)
 			
@@ -150,7 +144,7 @@ if __name__ == '__main__':
 				action = agent.selectAction(state, epsilon=0)
 
 				# 行動を実行
-				next_state, reward, done = agent.takeAction(action)
+				state, reward, done = agent.takeAction(action)
 
 				if done:
 					break
@@ -161,10 +155,6 @@ if __name__ == '__main__':
 
 			# 環境のリセット
 			state = agent.reset()
-
-			# 100回に1回Qテーブルを保存
-			if episode%100 == 0:
-				agent.dumpQ()
 
 			for _ in range(200):
 				# 行動を選択
@@ -181,7 +171,6 @@ if __name__ == '__main__':
 
 				if done:
 					if episode%100 == 0:
+						agent.dumpQ()
 						print('episode: {}, total_reward: {}'.format(episode, agent.sum_rewards))
 					break
-
-
